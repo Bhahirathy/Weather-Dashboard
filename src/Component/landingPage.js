@@ -8,7 +8,12 @@ export default function LandingPage() {
     const [city, setCity] = useState("")
     const [location, setLocation] = useState({ name: "", latitude: "", longitude: "", description: "" });
     const [currentWeather, setCurrentWeather] = useState(null);
+    const [temperature, setTemperature] = useState("");
+    const [icon, setIcon] = useState("")
+    const [wind, setWind] = useState("")
     const [forecast, setForecast] = useState([]);
+    const [forecastData, setForecastData] = useState(null);
+
     const getWeatherApi = async () => {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(async position => {
@@ -32,6 +37,11 @@ export default function LandingPage() {
 
                         });
                         setCurrentWeather(response.data.dt)
+                        setTemperature(response.data.main.temp)
+                        setIcon(response.data.weather.map((data) => {
+                            return data.icon
+                        }))
+                        setWind(response.data.wind.speed)
 
                     }
                 } catch (error) {
@@ -42,6 +52,27 @@ export default function LandingPage() {
 
     };
 
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async position => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                const apiKey = "efe5e49a8f9903142b34845847c5af83";
+
+                try {
+                    const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&cnt=7&appid=${apiKey}`);
+                    if (response.status === 200) {
+                        setForecastData(response.data);
+                        console.log("fore", response.data)
+                    }
+                } catch (error) {
+                    console.error('Error fetching forecast data:', error);
+                }
+            });
+        }
+    }, []);
+
+
 
     useEffect(() => {
         getWeatherApi();
@@ -49,115 +80,64 @@ export default function LandingPage() {
 
     return (
         <>
-            <div class="hero" data-bg-image="images/banner.png">
-                <div class="container">
-                    <form class="find-location">
+            <div className="hero" data-bg-image="images/banner.png">
+                <div className="container">
+                    <form className="find-location">
                         <input type="text" placeholder="Find your location..."></input>
                         <input type="submit" value="Find"></input>
                     </form>
 
                 </div>
             </div>
-            <div class="forecast-table">
-                <div class="container">
-                    <div class="forecast-container">
-                        <div class="today forecast">
-                            <div class="forecast-header">
-                                <div class="day">Monday</div>
-                                <div class="date">{new Date(parseInt(currentWeather?.dt) * 1000).toLocaleDateString()}</div>
+            <div className="forecast-table">
+                <div className="container">
+                    <div className="forecast-container">
+                        <div className="today forecast">
+                            <div className="forecast-header">
+                                <div className="day">{new Date(currentWeather * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                                <div className="date">{new Date(currentWeather * 1000).toLocaleDateString('en-US', { weekday: 'long' })}</div>
                             </div>
                             {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="location">{location.name}</div>
-                                <div class="degree">
-                                    <div class="num">23<sup>o</sup>C</div>
-                                    <div class="forecast-icon">
-                                        <img src={ForecastIcon} alt="" width="90" />
+                            <div className="forecast-content">
+                                <div className="location">{location.name}</div>
+                                <div className="degree">
+                                    <div className="num">{temperature}<sup>o</sup>C</div>
+                                    <div className="forecast-icon">
+                                        <img src={`http://openweathermap.org/img/w/${icon}.png`} alt="" width="90" />
                                     </div>
                                 </div>
                                 <span><img src={Umbrella} alt="" />20%</span>
-                                <span><img src={Wind} alt="" />18km/h</span>
+                                <span><img src={Wind} alt="" />{wind}km/h</span>
                                 <span><img src={Compass} alt="" />{location.description}</span>
                             </div>
                         </div>
-                        {<div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Tuesday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-3.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>}
-                        <div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Wednesday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-5.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>
-                        <div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Thursday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-7.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>
-                        <div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Friday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-12.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>
-                        <div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Saturday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-13.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>
-                        <div class="forecast">
-                            <div class="forecast-header">
-                                <div class="day">Sunday</div>
-                            </div>
-                            {/* <!-- .forecast-header --> */}
-                            <div class="forecast-content">
-                                <div class="forecast-icon">
-                                    <img src="images/icons/icon-14.svg" alt="" width="48" />
-                                </div>
-                                <div class="degree">23<sup>o</sup>C</div>
-                                <small>18<sup>o</sup></small>
-                            </div>
-                        </div>
+                        {forecastData && forecastData?.list.map((val, index) => {
+                            const date = new Date(val.dt * 1000);
+                            const time = date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+                            // if (time === '12:00 PM') {
+
+                            return (
+
+                                <>
+                                    <div className="forecast" key={index}>
+                                        <div className="forecast-header">
+                                            <div className="day">{new Date(val.dt * 1000).toLocaleDateString('en-US', { weekday: 'long' })}</div>
+                                        </div>
+                                        {/* <!-- .forecast-header --> */}
+                                        <div className="forecast-content">
+                                            <div className="forecast-icon">
+                                                <img src={`http://openweathermap.org/img/w/${val.weather[0].icon}.png`} alt="" width="48" />
+                                            </div>
+                                            <div className="degree">{(val.main.temp - 273.15).toFixed(2)}<sup>o</sup>C</div>
+                                            <small>{val.main.humidity}%</small>
+                                        </div>
+                                    </div>
+                                </>
+                            )
+                            // }
+                            // return null
+
+                        })}
                     </div>
                 </div>
             </div>
