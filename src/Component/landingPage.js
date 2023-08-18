@@ -110,7 +110,7 @@ export default function LandingPage() {
 
                 setLocation({
                     name: response.data.city.name,
-                    country: response.data.sys.country,
+                    country: response.data.city.country,
                     description: response.data.list[0].weather.map((data) => {
                         return data.description
                     }),
@@ -129,6 +129,7 @@ export default function LandingPage() {
                 const hourlyForecast = response.data.list.filter((item, index) => index % hoursInterval === 0);
                 setForecastHrsData(hourlyForecast);
                 console.log(hourlyForecast)
+                setCity("")
             } catch (error) {
                 console.error('Error fetching forecast data:', error);
             }
@@ -169,7 +170,7 @@ export default function LandingPage() {
                                 </div>
                                 <div className="forecast-display">
                                     <div className="forecast-content">
-                                        <div className="location">{location.name},{location.country}</div>
+                                        <div className="location">{location.name} {location.country}</div>
                                         <div className="degree">
                                             <div className="num">{temperature}<sup>o</sup>C</div>
                                             <div className="forecast-icon">
@@ -197,10 +198,12 @@ export default function LandingPage() {
                                             <div className="forecast-content">
                                                 <div className="forecast-icon">
                                                     <img src={`http://openweathermap.org/img/w/${val.weather[0].icon}.png`} alt="" width="48" />
+                                                    <p>{val.weather[0].description}</p>
+
                                                 </div>
+                                                <br />
                                                 <div className="degree">{(val.main.temp - 273.15).toFixed(2)}<sup>o</sup>C</div>
                                                 <small>{val.main.humidity}%</small>
-
                                             </div>
                                         </div>
                                     </>
@@ -226,7 +229,9 @@ export default function LandingPage() {
                                             <div className="forecast-content">
                                                 <div className="forecast-icon">
                                                     <img src={`http://openweathermap.org/img/w/${val.weather[0].icon}.png`} alt="" width="48" />
+                                                    <p>{val.weather[0].description}</p>
                                                 </div>
+                                                <br />
                                                 <div className="degree">{(val.main.temp - 273.15).toFixed(2)}<sup>o</sup>C</div>
                                                 <small>{val.main.humidity}%</small>
                                             </div>

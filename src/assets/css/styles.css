@@ -304,6 +304,21 @@ form input[type="reset"] {
     margin-top: -60px;
 }
 
+.icon:hover {
+    transform: scale(1.2);
+    /* Increase size on hover */
+    transition: transform 0.3s ease;
+}
+
+.transition-fade {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.transition-fade.show {
+    opacity: 1;
+}
+
 .dark {
     color: #bfc1c8;
     font-family: "Roboto", "Open Sans", sans-serif;
